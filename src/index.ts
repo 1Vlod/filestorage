@@ -6,6 +6,7 @@ import {
   unlinkSync,
   mkdirSync,
 } from 'fs';
+import { cipher, decipher } from './helpers/crypto';
 
 const SERVER_PORT = 8080;
 const UPLOADS_DIR_NAME = 'uploads';
@@ -34,8 +35,7 @@ const server = createServer((req, res) => {
           }
 
           const readStream = createReadStream(filePath);
-          readStream.pipe(res);
-          return;
+          readStream.pipe(decipher()).pipe(res);
         }
 
         break;
@@ -44,17 +44,19 @@ const server = createServer((req, res) => {
         const [_, id] = Math.random().toString().split('.');
         const filePath = `${UPLOADS_DIR_NAME}/file_${id}`;
 
-        req.pipe(createWriteStream(filePath));
-        req.addListener('end', () => {
-          res.end(`We got your file. Its id is ${id}`);
-        });
+        req
+          .pipe(cipher())
+          .pipe(createWriteStream(filePath))
+          .on('finish', () => {
+            res.end(`We got your file. Its id is ${id}`);
+          });
         break;
       }
       case 'DELETE': {
         if (url[2]) {
-          const filePath = `${UPLOADS_DIR_NAME}/${url[2]}`;
+          const filePath = `${UPLOADS_DIR_NAME}/file_${url[2]}`;
           const fileExists = existsSync(filePath);
-          
+
           if (!fileExists) {
             res.statusCode = 404;
             return res.end(
@@ -74,7 +76,6 @@ const server = createServer((req, res) => {
         break;
       }
     }
-    res.statusCode = 200;
     return;
   }
 
