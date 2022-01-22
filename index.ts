@@ -5,7 +5,6 @@ import {
   existsSync,
   unlinkSync,
 } from 'fs';
-import { getExtension } from './helpers';
 
 const SERVER_PORT = 8080;
 
@@ -39,22 +38,11 @@ const server = createServer((req, res) => {
         break;
       }
       case 'POST': {
-        const extension = getExtension(req.headers['content-type']?.split('/'));
-        if (!extension) {
-          res.statusCode = 400;
-          return res.end(
-            JSON.stringify({
-              statusCode: 400,
-              error: 'Bad request',
-              message: 'You need to set the right content-type to save file',
-            })
-          );
-        }
-        const number = Math.random().toString().split('.');
-        const filePath = `files/file_${number[1]}.${extension}`;
+        const [_, id] = Math.random().toString().split('.');
+        const filePath = `files/file_${id}`;
         req.pipe(createWriteStream(filePath));
         req.addListener('end', () => {
-          res.end(`We got your file. Its name is ${filePath}`);
+          res.end(`We got your file. Its id is ${id}`);
         });
         break;
       }
