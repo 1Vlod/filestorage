@@ -4,6 +4,7 @@ import {
   createReadStream,
   existsSync,
   unlinkSync,
+  mkdirSync,
 } from 'fs';
 
 const SERVER_PORT = 8080;
@@ -85,5 +86,8 @@ const server = createServer((req, res) => {
   return;
 });
 server.listen(SERVER_PORT, () => {
+  if (!existsSync('files')) {
+    mkdirSync('files');
+  }
   console.log(`Server started on ${SERVER_PORT} port`);
 });
