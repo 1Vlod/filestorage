@@ -5,8 +5,10 @@ import {
   existsSync,
   unlinkSync,
   mkdirSync,
+  statSync,
 } from 'fs';
 import { cipher, decipher } from './helpers/crypto';
+import { createGzip, createGunzip } from 'zlib';
 
 const SERVER_PORT = 8080;
 const UPLOADS_DIR_NAME = 'uploads';
@@ -21,7 +23,7 @@ const server = createServer((req, res) => {
     switch (req.method) {
       case 'GET': {
         if (url[2]) {
-          const filePath = `${UPLOADS_DIR_NAME}/file_${url[2]}`;
+          const filePath = `${UPLOADS_DIR_NAME}/file_${url[2]}.gz`;
           const fileExists = existsSync(filePath);
           if (!fileExists) {
             res.statusCode = 404;
@@ -35,20 +37,25 @@ const server = createServer((req, res) => {
           }
 
           const readStream = createReadStream(filePath);
-          readStream.pipe(decipher()).pipe(res);
+          readStream.pipe(decipher()).pipe(createGunzip()).pipe(res);
         }
 
         break;
       }
       case 'POST': {
         const [_, id] = Math.random().toString().split('.');
-        const filePath = `${UPLOADS_DIR_NAME}/file_${id}`;
+        const filePath = `${UPLOADS_DIR_NAME}/file_${id}.gz`;
 
         req
+          .pipe(createGzip())
           .pipe(cipher())
           .pipe(createWriteStream(filePath))
           .on('finish', () => {
-            res.end(`We got your file. Its id is ${id}`);
+            const size = statSync(filePath).size;
+            const fileSizeInMegabytes = size / (1024 * 1024);
+            res.end(
+              `We got your file. Its id is ${id}. File size is ${fileSizeInMegabytes} MB`
+            );
           });
         break;
       }
