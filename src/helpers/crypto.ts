@@ -1,25 +1,21 @@
-// crypto module
 import crypto from 'crypto';
+import config from '../config.json';
 
 const algorithm = 'aes-256-cbc';
-const vector = '';
-const key = '';
+const vector = config.initVector || 'MySuperSecretKey';
+const key = config.securityKey || 'MySuperSecretKey';
 
-const initVector = vector
-  ? crypto.randomBytes(16)
-  : crypto
-      .createHash('sha256')
-      .update('MySuperSecretKey')
-      .digest('base64')
-      .slice(0, 16);
+const initVector = crypto
+  .createHash('sha256')
+  .update(vector)
+  .digest('base64')
+  .slice(0, 16);
 
-const securityKey = key
-  ? crypto.randomBytes(32)
-  : crypto
-      .createHash('sha256')
-      .update('MySuperSecretKey')
-      .digest('base64')
-      .slice(0, 32);
+const securityKey = crypto
+  .createHash('sha256')
+  .update(key)
+  .digest('base64')
+  .slice(0, 32);
 
 const cipher = () => {
   return crypto.createCipheriv(algorithm, securityKey, initVector);

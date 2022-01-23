@@ -1,6 +1,6 @@
 import { createServer } from 'http';
 import { existsSync, mkdirSync } from 'fs';
-import { fileController } from './controller/fileService';
+import { fileController } from './controller/fileController';
 import { SERVER_PORT, UPLOADS_DIR_NAME } from './constants';
 
 const server = createServer((req, res) => {

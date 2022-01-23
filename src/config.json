@@ -1,0 +1,5 @@
+{
+  "initVector": "verySecretInitVector",
+  "securityKey": "verySecretSecurityKey",
+  "PORT": 8080
+}
