@@ -61,6 +61,5 @@ server.listen(SERVER_PORT, () => {
 });
 
 process.on('SIGINT', () => {
-  console.info('Interrupted');
   process.exit(0);
 });
