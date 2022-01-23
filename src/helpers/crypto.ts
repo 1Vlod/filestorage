@@ -2,8 +2,9 @@ import crypto from 'crypto';
 import config from '../config.json';
 
 const algorithm = 'aes-256-cbc';
-const vector = config.initVector || 'MySuperSecretKey';
-const key = config.securityKey || 'MySuperSecretKey';
+const vector =
+  process.env.initVector || config.initVector || 'MySuperSecretKey';
+const key = process.env.securityKey || config.securityKey || 'MySuperSecretKey';
 
 const initVector = crypto
   .createHash('sha256')
