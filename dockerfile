@@ -20,4 +20,4 @@ RUN npm run build
 
 EXPOSE 8080
 
-CMD [ "node", "./dist/index.js" ]
+ENTRYPOINT ["node","--enable-source-maps", "dist/index.js"]

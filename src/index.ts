@@ -59,3 +59,8 @@ server.listen(SERVER_PORT, () => {
   }
   console.log(`Server started on ${SERVER_PORT} port`);
 });
+
+process.on('SIGINT', () => {
+  console.info('Interrupted');
+  process.exit(0);
+});
